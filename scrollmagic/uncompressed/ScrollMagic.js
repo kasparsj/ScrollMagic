@@ -2182,14 +2182,13 @@
 			// set the pin Options
 			_pinOptions = {
 				spacer: spacer,
-				relSize: { // save if size is defined using % values. if so, handle spacer resize differently...
+				relSize: _util.extend({ // save if size is defined using % values. if so, handle spacer resize differently...
 					width: sizeCSS.width.slice(-1) === "%",
 					height: sizeCSS.height.slice(-1) === "%",
 					autoFullWidth: sizeCSS.width === "auto" && inFlow && _util.isMarginCollapseType(pinCSS.display)
-				},
+				}, settings.relSize || {}),
 				pushFollowers: settings.pushFollowers,
-				inFlow: inFlow,
-				// stores if the element takes up space in the document flow
+				inFlow: inFlow // stores if the element takes up space in the document flow
 			};
 
 			if (!_pin.___origStyle) {

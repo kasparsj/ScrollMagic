@@ -156,8 +156,8 @@ var updateRelativePinSpacer = function () {
 	if ( _controller && _pin && // well, duh
 			_state === "DURING" && // element in pinned state?
 			( // is width or height relatively sized, but not in relation to body? then we need to recalc.
-				((_pinOptions.relSize.width || _pinOptions.relSize.autoFullWidth) && _util.get.width(window) != _util.get.width(_pinOptions.spacer.parentNode)) ||
-				(_pinOptions.relSize.height && _util.get.height(window) != _util.get.height(_pinOptions.spacer.parentNode))
+				((_pinOptions.relSize.width || _pinOptions.relSize.autoFullWidth)/* && _util.get.width(window) != _util.get.width(_pinOptions.spacer.parentNode)*/) ||
+				(_pinOptions.relSize.height/* && _util.get.height(window) != _util.get.height(_pinOptions.spacer.parentNode)*/)
 			)
 	) {
 		updatePinDimensions();
@@ -272,11 +272,11 @@ this.setPin = function (element, settings) {
 	// set the pin Options
 	_pinOptions = {
 		spacer: spacer,
-		relSize: _util.extend({ // save if size is defined using % values. if so, handle spacer resize differently...
+		relSize: { // save if size is defined using % values. if so, handle spacer resize differently...
 			width: sizeCSS.width.slice(-1) === "%",
 			height: sizeCSS.height.slice(-1) === "%",
 			autoFullWidth: sizeCSS.width === "auto" && inFlow && _util.isMarginCollapseType(pinCSS.display)
-		}, settings.relSize || {}),
+		},
 		pushFollowers: settings.pushFollowers,
 		inFlow: inFlow // stores if the element takes up space in the document flow
 	};

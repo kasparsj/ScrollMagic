@@ -2334,9 +2334,8 @@
 			_cssClasses = classes;
 			_cssClassElems = elems;
 			Scene.on("enter.internal_class leave.internal_class", function (e) {
-				var toggle = e.type === "enter" ? _util.addClass : _util.removeClass;
 				_cssClassElems.forEach(function (elem, key) {
-					toggle(elem, _cssClasses);
+					_util.toggleClass(elem, _cssClasses);
 				});
 			});
 			return Scene;
@@ -2714,6 +2713,12 @@
 			if (classname) {
 				if (elem.classList) elem.classList.remove(classname);
 				else elem.className = elem.className.replace(new RegExp('(^|\\b)' + classname.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+			}
+		};
+		U.toggleClass = function (elem, classname) {
+			if (classname) {
+				if (elem.className.split(/\s+/).indexOf(classname) > -1) U.removeClass(classname);
+				else U.addClass(classname);
 			}
 		};
 		// if options is string -> returns css value

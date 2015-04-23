@@ -36,9 +36,8 @@ this.setClassToggle = function (element, classes) {
 	_cssClasses = classes;
 	_cssClassElems = elems;
 	Scene.on("enter.internal_class leave.internal_class", function (e) {
-		var toggle = e.type === "enter" ? _util.addClass : _util.removeClass;
 		_cssClassElems.forEach(function (elem, key) {
-			toggle(elem, _cssClasses);
+            _util.toggleClass(elem, _cssClasses);
 		});
 	});
 	return Scene;

@@ -236,9 +236,9 @@ var _util = ScrollMagic._util = (function (window) {
     U.toggleClass = function(elem, classname) {
         if (classname) {
             if (elem.className.split(/\s+/).indexOf(classname) > -1)
-                U.removeClass(classname);
+                U.removeClass(elem, classname);
             else
-                U.addClass(classname);
+                U.addClass(elem, classname);
         }
     };
 	// if options is string -> returns css value

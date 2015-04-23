@@ -2717,8 +2717,8 @@
 		};
 		U.toggleClass = function (elem, classname) {
 			if (classname) {
-				if (elem.className.split(/\s+/).indexOf(classname) > -1) U.removeClass(classname);
-				else U.addClass(classname);
+				if (elem.className.split(/\s+/).indexOf(classname) > -1) U.removeClass(elem, classname);
+				else U.addClass(elem, classname);
 			}
 		};
 		// if options is string -> returns css value

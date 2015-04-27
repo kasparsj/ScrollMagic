@@ -95,10 +95,14 @@ ScrollMagic.Scene = function (options) {
 				}
 			})
 			.on("shift.internal", function (e) {
-				updateScrollOffset();
 				Scene.update(); // update scene to reflect new position
 			});
 	};
+
+    Scene.on("shift.internal", function(e) {
+        // update scroll offset before is gets used in updatePinState
+        updateScrollOffset();
+    });
 
 	// @include('Scene/core.js')
 

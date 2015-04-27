@@ -99,11 +99,6 @@ ScrollMagic.Scene = function (options) {
 			});
 	};
 
-    Scene.on("shift.internal", function(e) {
-        // update scroll offset before is gets used in updatePinState
-        updateScrollOffset();
-    });
-
 	// @include('Scene/core.js')
 
 	// @include('Scene/update-params.js')
@@ -111,6 +106,11 @@ ScrollMagic.Scene = function (options) {
 	// @include('Scene/getters-setters.js')
 	
 	// @include('Scene/event-management.js')
+
+    Scene.on("shift.internal", function(e) {
+        // update scroll offset before is gets used in updatePinState
+        updateScrollOffset();
+    });
 	
 	// @include('Scene/feature-pinning.js')
 

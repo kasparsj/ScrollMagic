@@ -848,11 +848,6 @@
 			});
 		};
 
-		Scene.on("shift.internal", function (e) {
-			// update scroll offset before is gets used in updatePinState
-			updateScrollOffset();
-		});
-
 		/**
 		 * Send a debug message to the console.
 		 * @private
@@ -1912,6 +1907,11 @@
 			}
 			return Scene;
 		};
+
+		Scene.on("shift.internal", function (e) {
+			// update scroll offset before is gets used in updatePinState
+			updateScrollOffset();
+		});
 
 		var
 		_pin, _pinOptions;

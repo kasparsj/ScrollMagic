@@ -32,13 +32,14 @@ var updatePinState = function (forceUnpin) {
 			containerInfo = _controller.info();
 
 		if (!forceUnpin && _state === SCENE_STATE_DURING) { // during scene or if duration is 0 and we are past the trigger
+            // todo: create a fiddle and submit a bug report about this
 			// pinned state
-			if (_util.css(_pin, "position") != "fixed") {
-				// change state before updating pin spacer (position changes due to fixed collapsing might occur.)
-				_util.css(_pin, {"position": "fixed"});
-				// update pin spacer
+			//if (_util.css(_pin, "position") != "fixed") {
+			//	// change state before updating pin spacer (position changes due to fixed collapsing might occur.)
+			//	_util.css(_pin, {"position": "fixed"});
+			//	// update pin spacer
 				updatePinDimensions();
-			}
+			//}
 
 			var
 				fixedPos = _util.get.offset(_pinOptions.spacer, true), // get viewport position of spacer

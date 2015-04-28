@@ -1946,7 +1946,9 @@
 					// pinned state
 					//if (_util.css(_pin, "position") != "fixed") {
 					//	// change state before updating pin spacer (position changes due to fixed collapsing might occur.)
-					//	_util.css(_pin, {"position": "fixed"});
+					_util.css(_pin, {
+						"position": "fixed"
+					});
 					//	// update pin spacer
 					updatePinDimensions();
 					//}

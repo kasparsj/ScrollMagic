@@ -140,14 +140,14 @@ var updatePinDimensions = function () {
  * So this function is called on resize and scroll of the document.
  * @private
  */
-var listenToDocumentScroll = true;
+var isEarlyScroll = true;
 var updatePinInContainer = function () {
-	if (_controller && _pin && _state === SCENE_STATE_DURING && (!_controller.info("isDocument") || listenToDocumentScroll)) {
-		updatePinState();
+	if (_controller && _pin && _state === SCENE_STATE_DURING && (!_controller.info("isDocument") || isEarlyScroll)) {
+		setTimeout(updatePinState, 0);
 	}
 };
 setTimeout(function() {
-    listenToDocumentScroll = false;
+    isEarlyScroll = false;
 }, 500);
 
 /**

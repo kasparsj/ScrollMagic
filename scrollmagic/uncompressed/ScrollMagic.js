@@ -1,10 +1,10 @@
 /*!
- * ScrollMagic v2.0.3 (2015-04-07)
+ * ScrollMagic v2.0.5 (2015-04-29)
  * The javascript library for magical scroll interactions.
  * (c) 2015 Jan Paepke (@janpaepke)
  * Project Website: http://scrollmagic.io
  * 
- * @version 2.0.3
+ * @version 2.0.5
  * @license Dual licensed under MIT license and GPL.
  * @author Jan Paepke - e-mail@janpaepke.de
  *
@@ -31,7 +31,7 @@
 		_util.log(2, '(COMPATIBILITY NOTICE) -> As of ScrollMagic 2.0.0 you need to use \'new ScrollMagic.Controller()\' to create a new controller instance. Use \'new ScrollMagic.Scene()\' to instance a scene.');
 	};
 
-	ScrollMagic.version = "2.0.3";
+	ScrollMagic.version = "2.0.5";
 
 	// TODO: temporary workaround for chrome's scroll jitter bug
 	window.addEventListener("mousewheel", function () {});
@@ -1578,31 +1578,40 @@
 			var
 			elementPos = 0,
 				telem = _options.triggerElement;
-			if (_controller && telem) {
-				var
-				controllerInfo = _controller.info(),
-					containerOffset = _util.get.offset(controllerInfo.container),
-					// container position is needed because element offset is returned in relation to document, not in relation to container.
-					param = controllerInfo.vertical ? "top" : "left"; // which param is of interest ?
-				// if parent is spacer, use spacer position instead so correct start position is returned for pinned elements.
-				while (telem.parentNode.hasAttribute(PIN_SPACER_ATTRIBUTE)) {
-					telem = telem.parentNode;
+			if (_controller && (telem || _triggerPos > 0)) { // either an element exists or was removed and the triggerPos is still > 0
+				if (telem) { // there currently a triggerElement set
+					if (telem.parentNode) { // check if element is still attached to DOM
+						var
+						controllerInfo = _controller.info(),
+							containerOffset = _util.get.offset(controllerInfo.container),
+							// container position is needed because element offset is returned in relation to document, not in relation to container.
+							param = controllerInfo.vertical ? "top" : "left"; // which param is of interest ?
+						// if parent is spacer, use spacer position instead so correct start position is returned for pinned elements.
+						while (telem.parentNode.hasAttribute(PIN_SPACER_ATTRIBUTE)) {
+							telem = telem.parentNode;
+						}
+
+						var elementOffset = _util.get.offset(telem);
+
+						if (!controllerInfo.isDocument) { // container is not the document root, so substract scroll Position to get correct trigger element position relative to scrollcontent
+							containerOffset[param] -= _controller.scrollPos();
+						}
+
+						elementPos = elementOffset[param] - containerOffset[param];
+
+					} else { // there was an element, but it was removed from DOM
+						log(2, "WARNING: triggerElement was removed from DOM and will be reset to", undefined);
+						Scene.triggerElement(undefined); // unset, so a change event is triggered
+					}
 				}
 
-				var elementOffset = _util.get.offset(telem);
-
-				if (!controllerInfo.isDocument) { // container is not the document root, so substract scroll Position to get correct trigger element position relative to scrollcontent
-					containerOffset[param] -= _controller.scrollPos();
+				var changed = elementPos != _triggerPos;
+				_triggerPos = elementPos;
+				if (changed && !suppressEvents) {
+					Scene.trigger("shift", {
+						reason: "triggerElementPosition"
+					});
 				}
-
-				elementPos = elementOffset[param] - containerOffset[param];
-			}
-			var changed = elementPos != _triggerPos;
-			_triggerPos = elementPos;
-			if (changed && !suppressEvents) {
-				Scene.trigger("shift", {
-					reason: "triggerElementPosition"
-				});
 			}
 		};
 
@@ -1617,6 +1626,7 @@
 				});
 			}
 		};
+
 
 		var _validate = _util.extend(SCENE_OPTIONS.validate, {
 			// validation for duration handled internally for reference to private var _durationMethod
@@ -1939,13 +1949,13 @@
 		var updatePinState = function (forceUnpin) {
 			if (_pin && _controller) {
 				var
-				containerInfo = _controller.info();
-
+				containerInfo = _controller.info(),
+					pinTarget = _pinOptions.spacer.firstChild; // may be pin element or another spacer, if cascading pins
 				if (!forceUnpin && _state === SCENE_STATE_DURING) { // during scene or if duration is 0 and we are past the trigger
 					// pinned state
-					if (_util.css(_pin, "position") != "fixed") {
+					if (_util.css(pinTarget, "position") != "fixed") {
 						// change state before updating pin spacer (position changes due to fixed collapsing might occur.)
-						_util.css(_pin, {
+						_util.css(pinTarget, {
 							"position": "fixed"
 						});
 						// update pin spacer
@@ -1961,7 +1971,7 @@
 					fixedPos[containerInfo.vertical ? "top" : "left"] += scrollDistance;
 
 					// set new values
-					_util.css(_pin, {
+					_util.css(_pinOptions.spacer.firstChild, {
 						top: fixedPos.top,
 						left: fixedPos.left
 					});
@@ -1973,7 +1983,7 @@
 						top: 0,
 						left: 0
 					},
-						change = _util.css(_pin, "position") != newCSS.position;
+						change = _util.css(pinTarget, "position") != newCSS.position;
 
 					if (!_pinOptions.pushFollowers) {
 						newCSS[containerInfo.vertical ? "top" : "left"] = _options.duration * _progress;
@@ -1985,7 +1995,7 @@
 						}
 					}
 					// set new values
-					_util.css(_pin, newCSS);
+					_util.css(pinTarget, newCSS);
 					if (change) {
 						// update pin spacer if state changed
 						updatePinDimensions();
@@ -2006,7 +2016,7 @@
 					before = (_state === SCENE_STATE_BEFORE),
 					during = (_state === SCENE_STATE_DURING),
 					vertical = _controller.info("vertical"),
-					spacerChild = _pinOptions.spacer.children[0],
+					pinTarget = _pinOptions.spacer.firstChild,
 					// usually the pined element but can also be another spacer (cascaded pins)
 					marginCollapse = _util.isMarginCollapseType(_util.css(_pinOptions.spacer, "display")),
 					css = {};
@@ -2025,7 +2035,7 @@
 					}
 				} else {
 					// minwidth is needed for cascaded pins.
-					css["min-width"] = _util.get.width(vertical ? _pin : spacerChild, true, true);
+					css["min-width"] = _util.get.width(vertical ? _pin : pinTarget, true, true);
 					css.width = during ? css["min-width"] : "auto";
 				}
 				if (_pinOptions.relSize.height) {
@@ -2041,7 +2051,7 @@
 					}
 				} else {
 					// margin is only included if it's a cascaded pin to resolve an IE9 bug
-					css["min-height"] = _util.get.height(vertical ? spacerChild : _pin, true, !marginCollapse); // needed for cascading pins
+					css["min-height"] = _util.get.height(vertical ? pinTarget : _pin, true, !marginCollapse); // needed for cascading pins
 					css.height = during ? css["min-height"] : "auto";
 				}
 
@@ -2276,8 +2286,8 @@
 					updatePinState(true); // force unpin at position
 				}
 				if (reset || !_controller) { // if there's no controller no progress was made anyway...
-					var spacerChild = _pinOptions.spacer.children[0]; // usually the pin element, but may be another spacer...
-					if (spacerChild.hasAttribute(PIN_SPACER_ATTRIBUTE)) { // copy margins to child spacer
+					var pinTarget = _pinOptions.spacer.firstChild; // usually the pin element, but may be another spacer (cascaded pins)...
+					if (pinTarget.hasAttribute(PIN_SPACER_ATTRIBUTE)) { // copy margins to child spacer
 						var
 						style = _pinOptions.spacer.style,
 							values = ["margin", "marginLeft", "marginRight", "marginTop", "marginBottom"];
@@ -2285,9 +2295,9 @@
 						values.forEach(function (val) {
 							margins[val] = style[val] || "";
 						});
-						_util.css(spacerChild, margins);
+						_util.css(pinTarget, margins);
 					}
-					_pinOptions.spacer.parentNode.insertBefore(spacerChild, _pinOptions.spacer);
+					_pinOptions.spacer.parentNode.insertBefore(pinTarget, _pinOptions.spacer);
 					_pinOptions.spacer.parentNode.removeChild(_pinOptions.spacer);
 					if (!_pin.parentNode.hasAttribute(PIN_SPACER_ATTRIBUTE)) { // if it's the last pin for this element -> restore inline styles
 						// TODO: only correctly set for first pin (when cascading) - how to fix?
@@ -2452,7 +2462,7 @@
 				val = val || undefined;
 				if (val) {
 					var elem = _util.get.elements(val)[0];
-					if (elem) {
+					if (elem && elem.parentNode) {
 						val = elem;
 					} else {
 						throw ["Element defined in option \"triggerElement\" was not found:", val];
@@ -2518,6 +2528,7 @@
 		ScrollMagic.Scene.prototype = oldClass.prototype; // copy prototype
 		ScrollMagic.Scene.prototype.constructor = ScrollMagic.Scene; // restore constructor
 	};
+
 
 
 	/**

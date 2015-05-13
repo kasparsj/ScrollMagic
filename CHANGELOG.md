@@ -1,10 +1,19 @@
 CHANGELOG
 =========
 
-## 2.0.4 (unreleased)
+## 2.0.6 (unreleased)
 
 #### bugfixes:
- - fixed JS error in IE9 [see here](https://github.com/janpaepke/ScrollMagic/issues/289)
+ - errors occurred, when removing a triggerElement [see here](https://github.com/janpaepke/ScrollMagic/issues/307)
+
+
+## 2.0.5 (2015-04-29)
+
+#### bugfixes:
+ - a JS error occurred in IE9 [see here](https://github.com/janpaepke/ScrollMagic/issues/289)
+ - cascading pins of absolutely positioned elements didn't work [see here](https://github.com/janpaepke/ScrollMagic/issues/291)
+ - scene state wasn't correct at start position [see here](https://github.com/janpaepke/ScrollMagic/issues/299)
+ - updatePinState was called before scrollOffset update [see here](https://github.com/janpaepke/ScrollMagic/pull/303)
 
 
 ## 2.0.3 (2015-04-07)

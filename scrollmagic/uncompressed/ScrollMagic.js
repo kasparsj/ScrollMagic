@@ -1642,7 +1642,7 @@
 					// function
 					_durationUpdateMethod = val;
 					try {
-						val = parseFloat(_durationUpdateMethod());
+						val = parseFloat(_durationUpdateMethod.call(Scene));
 					} catch (e) {
 						val = -1; // will cause error below
 					}

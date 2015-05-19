@@ -1,4 +1,11 @@
-var _parallaxElems = [];
+var _parallaxElems = [],
+    _resetParallax = function() {
+        _parallaxElems.forEach(function (elem, key) {
+            _util.css(elem, {
+                transform: ""
+            });
+        });
+    };
 
 Scene.on("destroy.internal", function (e) {
     Scene.removeParallax(e.reset);
@@ -20,16 +27,29 @@ this.setParallax = function(element, params) {
     _parallaxElems = elems;
     params = params || {};
     var speed = params.speed || 0.5;
-    Scene.on("update.internal_parallax", function(e) {
-        if (e.scrollPos >= e.startPos) {
-            var distance = (e.scrollPos - e.startPos) * speed;
-            _parallaxElems.forEach(function (elem, key) {
-                _util.css(elem, {
-                    transform: "translateY("+distance+"px)"
+    Scene
+        .on("update.internal_parallax", function (e) {
+            if (e.scrollPos >= e.endPos) {
+                setY(e.endPos - e.startPos);
+            }
+            else if (e.scrollPos >= e.startPos) {
+                setY(e.scrollPos - e.startPos);
+            }
+
+            function setY(value) {
+                var distance = value * speed;
+                _parallaxElems.forEach(function (elem, key) {
+                    _util.css(elem, {
+                        transform: "translateY(" + distance + "px)"
+                    });
                 });
-            });
-        }
-    });
+            }
+        })
+        .on("leave.internal_parallax", function(e) {
+            if (e.state == SCENE_STATE_BEFORE) {
+                _resetParallax();
+            }
+        });
     return Scene;
 };
 
@@ -38,11 +58,7 @@ this.setParallax = function(element, params) {
  */
 this.removeParallax = function(reset) {
     if (reset) {
-        _parallaxElems.forEach(function (elem, key) {
-            _util.css(elem, {
-                transform: ""
-            });
-        });
+        _resetParallax();
     }
     Scene.off("update.internal_parallax");
     return Scene;

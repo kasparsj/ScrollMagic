@@ -2341,7 +2341,7 @@
 		 *
 		 * @returns {Scene} Parent object for chaining.
 		 */
-		this.setClassToggle = function (element, classes) {
+		this.setClassToggle = function (element, classes, toggleClass) {
 			var elems = _util.get.elements(element);
 			if (elems.length === 0 || !_util.type.String(classes)) {
 				log(1, "ERROR calling method 'setClassToggle()': Invalid " + (elems.length === 0 ? "element" : "classes") + " supplied.");
@@ -2354,8 +2354,14 @@
 			_cssClasses = classes;
 			_cssClassElems = elems;
 			Scene.on("enter.internal_class leave.internal_class", function (e) {
+				var toggle = e.type === "enter" ? _util.addClass : _util.removeClass;
 				_cssClassElems.forEach(function (elem, key) {
-					_util.toggleClass(elem, _cssClasses);
+					if (toggleClass) {
+						_util.toggleClass(elem, _cssClasses);
+					}
+					else {
+						toggle(elem, _cssClasses);
+					}
 				});
 			});
 			return Scene;
@@ -2377,6 +2383,7 @@
 		this.removeClassToggle = function (reset) {
 			if (reset) {
 				_cssClassElems.forEach(function (elem, key) {
+					// todo: add support for toggleClass parameter
 					_util.removeClass(elem, _cssClasses);
 				});
 			}

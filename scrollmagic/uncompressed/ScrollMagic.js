@@ -2397,6 +2397,8 @@
 			_resetParallax = function () {
 				_parallaxElems.forEach(function (elem, key) {
 					_util.css(elem, {
+						"-ms-transform": "",
+						"-webkit-transform": "",
 						transform: ""
 					});
 				});
@@ -2434,6 +2436,8 @@
 					var distance = value * speed;
 					_parallaxElems.forEach(function (elem, key) {
 						_util.css(elem, {
+							"-ms-transform": "translateY(" + distance + "px)",
+							"-webkit-transform": "translateY(" + distance + "px)",
 							transform: "translateY(" + distance + "px)"
 						});
 					});

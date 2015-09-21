@@ -2,6 +2,8 @@ var _parallaxElems = [],
     _resetParallax = function() {
         _parallaxElems.forEach(function (elem, key) {
             _util.css(elem, {
+                "-ms-transform": "",
+                "-webkit-transform": "",
                 transform: ""
             });
         });
@@ -40,6 +42,8 @@ this.setParallax = function(element, params) {
                 var distance = value * speed;
                 _parallaxElems.forEach(function (elem, key) {
                     _util.css(elem, {
+                        "-ms-transform": "translateY(" + distance + "px)",
+                        "-webkit-transform": "translateY(" + distance + "px)",
                         transform: "translateY(" + distance + "px)"
                     });
                 });

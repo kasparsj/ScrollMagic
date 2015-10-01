@@ -32,19 +32,22 @@ this.setParallax = function(element, params) {
     Scene
         .on("update.internal_parallax", function (e) {
             if (e.scrollPos >= e.endPos) {
-                setY(e.endPos - e.startPos);
+                setTranslateY(e.endPos - e.startPos);
             }
             else if (e.scrollPos >= e.startPos) {
-                setY(e.scrollPos - e.startPos);
+                setTranslateY(e.scrollPos - e.startPos);
             }
 
-            function setY(value) {
-                var distance = value * speed;
+            function setTranslateY(value) {
                 _parallaxElems.forEach(function (elem, key) {
+                    var translateX = _util.getTranslateX(elem),
+                        translateY = (value * speed).toFixed(2),
+                        translateZ = _util.getTranslateZ(elem),
+                        transform = "translate3d(" + translateX + "px," + translateY + "px," + translateZ + "px)";
                     _util.css(elem, {
-                        "-ms-transform": "translateY(" + distance + "px)",
-                        "-webkit-transform": "translateY(" + distance + "px)",
-                        transform: "translateY(" + distance + "px)"
+                        "-ms-transform": transform,
+                        "-webkit-transform": transform,
+                        transform: transform
                     });
                 });
             }

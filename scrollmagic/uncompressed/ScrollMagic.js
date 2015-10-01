@@ -2426,19 +2426,22 @@
 			var speed = params.speed || 0.5;
 			Scene.on("update.internal_parallax", function (e) {
 				if (e.scrollPos >= e.endPos) {
-					setY(e.endPos - e.startPos);
+					setTranslateY(e.endPos - e.startPos);
 				}
 				else if (e.scrollPos >= e.startPos) {
-					setY(e.scrollPos - e.startPos);
+					setTranslateY(e.scrollPos - e.startPos);
 				}
 
-				function setY(value) {
-					var distance = value * speed;
+				function setTranslateY(value) {
 					_parallaxElems.forEach(function (elem, key) {
+						var translateX = _util.getTranslateX(elem),
+							translateY = (value * speed).toFixed(2),
+							translateZ = _util.getTranslateZ(elem),
+							transform = "translate3d(" + translateX + "px," + translateY + "px," + translateZ + "px)";
 						_util.css(elem, {
-							"-ms-transform": "translateY(" + distance + "px)",
-							"-webkit-transform": "translateY(" + distance + "px)",
-							transform: "translateY(" + distance + "px)"
+							"-ms-transform": transform,
+							"-webkit-transform": transform,
+							transform: transform
 						});
 					});
 				}
@@ -2841,6 +2844,22 @@
 					elem.style[_camelCase(option)] = val;
 				}
 			}
+		};
+		U.getTranslateX = function (elem) {
+			if (!window.getComputedStyle) return;
+			var style = getComputedStyle(elem),
+				transform = style.transform || style.webkitTransform || style.mozTransform;
+			var mat = transform.match(/^matrix3d\((.+)\)$/);
+			if (mat) return parseFloat(mat[1].split(', ')[12]);
+			mat = transform.match(/^matrix\((.+)\)$/);
+			return mat ? parseFloat(mat[1].split(', ')[4]) : 0;
+		};
+		U.getTranslateZ = function (elem) {
+			if (!window.getComputedStyle) return;
+			var style = getComputedStyle(elem),
+				transform = style.transform || style.webkitTransform || style.mozTransform;
+			var mat = transform.match(/^matrix3d\((.+)\)$/);
+			return mat ? parseFloat(mat[1].split(', ')[14]) : 0;
 		};
 
 		return U;

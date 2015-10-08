@@ -265,22 +265,6 @@ var _util = ScrollMagic._util = (function (window) {
 			}
 		}
 	};
-    U.getTranslateX = function(elem) {
-        if(!window.getComputedStyle) return;
-        var style = getComputedStyle(elem),
-            transform = style.transform || style.webkitTransform || style.mozTransform;
-        var mat = transform.match(/^matrix3d\((.+)\)$/);
-        if(mat) return parseFloat(mat[1].split(', ')[12]);
-        mat = transform.match(/^matrix\((.+)\)$/);
-        return mat ? parseFloat(mat[1].split(', ')[4]) : 0;
-    };
-    U.getTranslateZ = function(elem) {
-        if(!window.getComputedStyle) return;
-        var style = getComputedStyle(elem),
-            transform = style.transform || style.webkitTransform || style.mozTransform;
-        var mat = transform.match(/^matrix3d\((.+)\)$/);
-        return mat ? parseFloat(mat[1].split(', ')[14]) : 0;
-    };
 
 	return U;
 }(window || {}));

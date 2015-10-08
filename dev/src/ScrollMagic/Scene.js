@@ -100,8 +100,6 @@ ScrollMagic.Scene = function (options) {
 
 	// @include('Scene/feature-classToggles.js')
 
-    // @include('Scene/feature-parallax.js')
-
 	// INIT
 	construct();
 	return Scene;

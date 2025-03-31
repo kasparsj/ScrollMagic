@@ -182,7 +182,7 @@ var onMousewheelOverPin = function (e) {
 };
 
 /**
- * Pin an element for the duration of the tween.  
+ * Pin an element for the duration of the scene.
  * If the scene duration is 0 the element will only be unpinned, if the user scrolls back past the start position.  
  * Make sure only one pin is applied to an element at the same time.
  * An element can be pinned multiple times, but only successively.
@@ -209,6 +209,9 @@ this.setPin = function (element, settings) {
 			pushFollowers: true,
 			spacerClass: "scrollmagic-pin-spacer"
 		};
+	// (BUILD) - REMOVE IN MINIFY - START
+	var pushFollowersActivelySet = settings && settings.hasOwnProperty('pushFollowers');
+	// (BUILD) - REMOVE IN MINIFY - END
 	settings = _util.extend({}, defaultSettings, settings);
 
 	// validate Element
@@ -250,7 +253,7 @@ this.setPin = function (element, settings) {
 	}
 	// (BUILD) - REMOVE IN MINIFY - START
 	window.setTimeout(function () { // wait until all finished, because with responsive duration it will only be set after scene is added to controller
-		if (_pin && _options.duration === 0 && settings.pushFollowers) {
+		if (_pin && _options.duration === 0 && pushFollowersActivelySet && settings.pushFollowers) {
 			log(2, "WARNING: pushFollowers =", true, "has no effect, when scene duration is 0.");
 		}
 	}, 0);
@@ -363,7 +366,7 @@ this.removePin = function (reset) {
 			if (pinTarget.hasAttribute(PIN_SPACER_ATTRIBUTE)) { // copy margins to child spacer
 				var
 					style = _pinOptions.spacer.style,
-					values = ["margin", "marginLeft", "marginRight", "marginTop", "marginBottom"];
+					values = ["margin", "marginLeft", "marginRight", "marginTop", "marginBottom"],
 					margins = {};
 				values.forEach(function (val) {
 					margins[val] = style[val] || "";

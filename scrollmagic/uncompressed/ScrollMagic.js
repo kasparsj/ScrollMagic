@@ -2088,11 +2088,15 @@
 		 * So this function is called on resize and scroll of the document.
 		 * @private
 		 */
+		var isEarlyScroll = true;
 		var updatePinInContainer = function () {
-			if (_controller && _pin && _state === SCENE_STATE_DURING && !_controller.info("isDocument")) {
-				updatePinState();
+			if (_controller && _pin && _state === SCENE_STATE_DURING && (!_controller.info("isDocument") || isEarlyScroll)) {
+				setTimeout(updatePinState, 0);
 			}
 		};
+		setTimeout(function () {
+			isEarlyScroll = false;
+		}, 500);
 
 		/**
 		 * Updates the Pin spacer size state (in certain scenarios)
@@ -2104,8 +2108,8 @@
 			if (_controller && _pin && // well, duh
 				_state === SCENE_STATE_DURING && // element in pinned state?
 				( // is width or height relatively sized, but not in relation to body? then we need to recalc.
-					((_pinOptions.relSize.width || _pinOptions.relSize.autoFullWidth) && _util.get.width(window) != _util.get.width(_pinOptions.spacer.parentNode)) ||
-					(_pinOptions.relSize.height && _util.get.height(window) != _util.get.height(_pinOptions.spacer.parentNode))
+					((_pinOptions.relSize.width || _pinOptions.relSize.autoFullWidth) /* && _util.get.width(window) != _util.get.width(_pinOptions.spacer.parentNode)*/ ) ||
+					(_pinOptions.relSize.height /* && _util.get.height(window) != _util.get.height(_pinOptions.spacer.parentNode)*/ )
 				)
 			) {
 				updatePinDimensions();
@@ -2225,7 +2229,7 @@
 					autoFullWidth: sizeCSS.width === "auto" && inFlow && _util.isMarginCollapseType(pinCSS.display)
 				},
 				pushFollowers: settings.pushFollowers,
-				inFlow: inFlow, // stores if the element takes up space in the document flow
+				inFlow: inFlow // stores if the element takes up space in the document flow
 			};
 
 			if (!_pin.___origStyle) {
@@ -2361,7 +2365,7 @@
 		 *
 		 * @returns {Scene} Parent object for chaining.
 		 */
-		this.setClassToggle = function (element, classes) {
+		this.setClassToggle = function (element, classes, toggleClass) {
 			var elems = _util.get.elements(element);
 			if (elems.length === 0 || !_util.type.String(classes)) {
 				log(1, "ERROR calling method 'setClassToggle()': Invalid " + (elems.length === 0 ? "element" : "classes") + " supplied.");
@@ -2376,7 +2380,11 @@
 			Scene.on("enter.internal_class leave.internal_class", function (e) {
 				var toggle = e.type === "enter" ? _util.addClass : _util.removeClass;
 				_cssClassElems.forEach(function (elem, key) {
-					toggle(elem, _cssClasses);
+					if (toggleClass) {
+						_util.toggleClass(elem, _cssClasses);
+					} else {
+						toggle(elem, _cssClasses);
+					}
 				});
 			});
 			return Scene;
@@ -2398,6 +2406,7 @@
 		this.removeClassToggle = function (reset) {
 			if (reset) {
 				_cssClassElems.forEach(function (elem, key) {
+					// todo: add support for toggleClass parameter
 					_util.removeClass(elem, _cssClasses);
 				});
 			}
@@ -2758,6 +2767,14 @@
 					elem.classList.remove(classname);
 				else
 					elem.className = elem.className.replace(new RegExp('(^|\\b)' + classname.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+			}
+		};
+		U.toggleClass = function (elem, classname) {
+			if (classname) {
+				if (elem.className.split(/\s+/).indexOf(classname) > -1)
+					U.removeClass(elem, classname);
+				else
+					U.addClass(elem, classname);
 			}
 		};
 		// if options is string -> returns css value
